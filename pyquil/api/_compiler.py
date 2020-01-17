@@ -23,6 +23,8 @@ from collections import Counter
 from rpcq._base import Message, to_json, from_json
 from rpcq._client import Client
 from rpcq.messages import (
+    QuiltCalibrationsRequest,
+    QuiltCalibrationsResponse,
     BinaryExecutableRequest,
     BinaryExecutableResponse,
     NativeQuilRequest,
@@ -316,6 +318,14 @@ class QPUCompiler(AbstractCompiler):
         nq_program.native_quil_metadata = response["metadata"]
         nq_program.num_shots = program.num_shots
         return nq_program
+
+    @_record_call
+    def get_quilt_calibrations(self) -> Program:
+        self._connect_qpu_compiler()
+        request = QuiltCalibrationsRequest(target_device=self.target_device)
+        response = self.qpu_compiler_client.call("get_quilt_calibrations", request)
+        calibration_program = parse_program(response.quilt)
+        return calibration_program
 
     @_record_call
     def native_quil_to_executable(self, nq_program: Program) -> Optional[BinaryExecutableResponse]:
