@@ -352,14 +352,9 @@ class QPUCompiler(AbstractCompiler):
                 "but be careful!"
             )
 
-        arithmetic_request = RewriteArithmeticRequest(quil=nq_program.out())
-        arithmetic_response: RewriteArithmeticResponse = cast(
-            RewriteArithmeticResponse,
-            self.quilc_client.call("rewrite_arithmetic", arithmetic_request),
-        )
-
         request = BinaryExecutableRequest(
-            quil=arithmetic_response.quil, num_shots=nq_program.num_shots
+            quil=nq_program.out(),
+            num_shots=nq_program.num_shots
         )
         response: BinaryExecutableResponse = cast(
             BinaryExecutableResponse,
@@ -369,7 +364,6 @@ class QPUCompiler(AbstractCompiler):
         # hack! we're storing a little extra info in the executable binary that we don't want to
         # expose to anyone outside of our own private lives: not the user, not the Forest server,
         # not anyone.
-        response.recalculation_table = arithmetic_response.recalculation_table  # type: ignore
         response.memory_descriptors = _collect_memory_descriptors(nq_program)
         response.ro_sources = _collect_classical_memory_write_locations(nq_program)
         return response
