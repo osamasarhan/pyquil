@@ -328,6 +328,12 @@ class QPUCompiler(AbstractCompiler):
         return calibration_program
 
     @_record_call
+    def build_qpu_settings(self) -> Program:
+        self._connect_qpu_compiler()
+        response = self.qpu_compiler_client.call("build_qpu_settings", None, rpc_timeout=60)
+        return response
+
+    @_record_call
     def native_quil_to_executable(self, nq_program: Program) -> Optional[BinaryExecutableResponse]:
         if not self.qpu_compiler_client:
             raise UserMessageError(
