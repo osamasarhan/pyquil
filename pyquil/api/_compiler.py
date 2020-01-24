@@ -25,8 +25,8 @@ from rpcq._client import Client
 from rpcq.messages import (
     QuiltCalibrationsRequest,
     QuiltCalibrationsResponse,
-    BinaryExecutableRequest,
-    BinaryExecutableResponse,
+    QuiltBinaryExecutableRequest,
+    QuiltBinaryExecutableResponse,
     NativeQuilRequest,
     TargetDevice,
     PyQuilExecutableResponse,
@@ -334,7 +334,7 @@ class QPUCompiler(AbstractCompiler):
         return response
 
     @_record_call
-    def native_quil_to_executable(self, nq_program: Program) -> Optional[BinaryExecutableResponse]:
+    def native_quil_to_executable(self, nq_program: Program, debug: bool = False) -> Optional[QuiltBinaryExecutableResponse]:
         if not self.qpu_compiler_client:
             raise UserMessageError(
                 "It looks like you're trying to compile to an executable, but "
@@ -352,14 +352,17 @@ class QPUCompiler(AbstractCompiler):
                 "but be careful!"
             )
 
-        request = BinaryExecutableRequest(
-            quil=nq_program.out(),
+        request = QuiltBinaryExecutableRequest(
+            quilt=nq_program.out(),
             num_shots=nq_program.num_shots
         )
-        response: BinaryExecutableResponse = cast(
-            BinaryExecutableResponse,
-            self.qpu_compiler_client.call("native_quil_to_binary", request),
+        response: QuiltBinaryExecutableResponse = cast(
+            QuiltBinaryExecutableResponse,
+            self.qpu_compiler_client.call("native_quilt_to_binary", request),
         )
+
+        if not debug:
+            response.debug = {}
 
         # hack! we're storing a little extra info in the executable binary that we don't want to
         # expose to anyone outside of our own private lives: not the user, not the Forest server,
