@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 from rpcq._client import Client, ClientAuthConfig
-from rpcq.messages import BinaryExecutableResponse, QPURequest, ParameterAref
+from rpcq.messages import BinaryExecutableResponse, QuiltBinaryExecutableResponse, QPURequest, ParameterAref
 
 from pyquil.parser import parse
 from pyquil.api._base_connection import Engagement, ForestSession
@@ -281,7 +281,7 @@ support at support@rigetti.com."""
                     self._executable.recalculation_table  # type: ignore
                 )
 
-        assert isinstance(self._executable, BinaryExecutableResponse)
+        assert isinstance(self._executable, (BinaryExecutableResponse, QuiltBinaryExecutableResponse))
         for name, spec in self._executable.memory_descriptors.items():
             # NOTE: right now we fake reading out measurement values into classical memory
             if name == "ro":
