@@ -1109,7 +1109,7 @@ def validate_protoquil(program: Program) -> None:
 
     :param program: The Quil program to validate.
     """
-    valid_instruction_types = tuple([Pragma, Declare, Halt, Gate, Reset, ResetQubit, Measurement])
+    valid_instruction_types = tuple([Pragma, Declare, Gate, Reset, ResetQubit, Measurement])
     for instr in program.instructions:
         if not isinstance(instr, valid_instruction_types):
             # Instructions like MOVE, NOT, JUMP, JUMP-UNLESS will fail here
